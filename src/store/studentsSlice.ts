@@ -49,6 +49,21 @@ const studentsSlice = createSlice({
                 student.status = student.status === 'active' ? 'paused' : 'active';
             }
         }
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchStudents.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchStudents.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.list = action.payload;
+            })
+            .addCase(fetchStudents.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.error.message || 'Произошла неизвестная ошибка';
+            })
     }
 });
 
