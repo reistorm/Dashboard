@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { useAppSelector } from "../hooks/redux";
+import { useAppSelector, useAppDispatch } from "../hooks/redux";
+import { deleteStudent, toggleStudentStatus } from "../store/studentsSlice";
 
 const StudentsList = () => {
     const students = useAppSelector((state) => state.students.list);
+    const dispatch = useAppDispatch();
+
     const [searchQuery, setSearchQuery] = useState('');
 
     const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -51,6 +54,35 @@ const StudentsList = () => {
                                 }}>
                                     {student.status === 'active' ? 'Активен' : 'Пауза'}
                                 </span>
+                            </td>
+                            <td style={{ padding: '15px', display: 'flex', gap: '10px' }}>
+                                <button
+                                    onClick={() => dispatch(toggleStudentStatus(student.id))}
+                                    style={{
+                                        padding: '6px 10px',
+                                        backgroundColor: '#e2e8f0',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px'
+                                    }}
+                                >
+                                    Сменить статус
+                                </button>
+                                <button
+                                    onClick={() => dispatch(deleteStudent(student.id))}
+                                    style={{
+                                        padding: '6px 10px',
+                                        backgroundColor: '#ef4444',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        fontSize: '12px'
+                                    }}
+                                >
+                                    Удалить
+                                </button>
                             </td>
                         </tr>
                     ))}

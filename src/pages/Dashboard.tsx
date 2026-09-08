@@ -1,12 +1,19 @@
 import { useAppSelector } from "../hooks/redux";
 import AddStudentForm from "../components/AddStudentForm";
+import StudentsChart from '../components/StudentsChart'
 
 const Dashboard = () => {
     const students = useAppSelector((state) => state.students.list)
     return (
         <div>
             <h1 style={{ marginBottom: '20px' }}>Обзорная панель (Dashboard)</h1>
-            <AddStudentForm />
+            <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap', marginBottom: '30px' }}
+            >
+                <AddStudentForm />
+                <StudentsChart />
+            </div>
+
+            <h2 style={{ marginBottom: '15px' }}>Последние ученики</h2>
             <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                 {students.map((student) => (
                     <div
