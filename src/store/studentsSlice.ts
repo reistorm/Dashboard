@@ -1,4 +1,4 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface Student {
     id: string;
@@ -11,28 +11,27 @@ export interface Student {
 
 interface StudentsState {
     list: Student[];
+    isLoading: boolean;
+    error: string | null;
 }
 
 const initialState: StudentsState = {
-    list: [
-        {
-            id: '1',
-            name: 'Сергей Иванов',
-            language: 'Japanese',
-            targetExam: 'JLPT N4',
-            currentTopic: 'Изучение кандзи и аудирование',
-            status: 'active',
-        },
-        {
-            id: '2',
-            name: 'Мария Сидорова',
-            language: 'English',
-            targetExam: 'IELTS',
-            currentTopic: 'Грамматика по Murphy: Past Perfect Continuous',
-            status: 'active',
-        }
-    ]
+    list: [],
+    isLoading: false,
+    error: null,
 };
+
+export const fetchStudents = createAsyncThunk<Student[]>(
+    'students/fetchStudents',
+    async () => {
+        const response = await fetch('http://localhost:3001/students');
+        if (!response.ok) {
+            throw new Error('Не удалось загрузить данные с сервера');
+        }
+        const data = await response.json();
+        return data;
+    }
+)
 
 const studentsSlice = createSlice({
     name: 'students',
