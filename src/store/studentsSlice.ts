@@ -40,9 +40,18 @@ const studentsSlice = createSlice({
     reducers: {
         addStudent: (state, action: PayloadAction<Student>) => {
             state.list.push(action.payload)
+        },
+        deleteStudent: (state, action: PayloadAction<string>) => {
+            state.list = state.list.filter(student => student.id !== action.payload)
+        },
+        toggleStudentStatus: (state, action: PayloadAction<string>) => {
+            const student = state.list.find(s => s.id === action.payload);
+            if (student) {
+                student.status = student.status === 'active' ? 'paused' : 'active';
+            }
         }
     }
 });
 
-export const { addStudent } = studentsSlice.actions;
+export const { addStudent, deleteStudent, toggleStudentStatus } = studentsSlice.actions;
 export default studentsSlice.reducer;
