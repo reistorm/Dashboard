@@ -33,16 +33,42 @@ export const fetchStudents = createAsyncThunk<Student[]>(
     }
 )
 
+export const addNewStudent = createAsyncThunk<Student, Student>(
+    'students/addNewStudent',
+    async (newStudent) => {
+        const response = await fetch('http://localhost:3001/students', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newStudent),
+        });
+        if (!response.ok) {
+            throw new Error('Не удалось добавить ученика на сервер');
+        }
+        const data = await response.json();
+        return data;
+    }
+)
+
+export const deleteStudentFromServer = createAsyncThunk<string, string>(
+    'students/deleteStudent',
+    async (id) => {
+        const response = await fetch(`http://localhost:3001/students/${id}`, {
+            method: 'DELETE',
+        });
+        if (!response.ok) {
+            throw new Error('Не удалось удалить ученика на сервер');
+        }
+
+        return id;
+    }
+)
+
 const studentsSlice = createSlice({
     name: 'students',
     initialState,
     reducers: {
-        addStudent: (state, action: PayloadAction<Student>) => {
-            state.list.push(action.payload)
-        },
-        deleteStudent: (state, action: PayloadAction<string>) => {
-            state.list = state.list.filter(student => student.id !== action.payload)
-        },
         toggleStudentStatus: (state, action: PayloadAction<string>) => {
             const student = state.list.find(s => s.id === action.payload);
             if (student) {
@@ -64,8 +90,14 @@ const studentsSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.error.message || 'Произошла неизвестная ошибка';
             })
+            .addCase(addNewStudent.fulfilled, (state, action) => {
+                state.list.push(action.payload)
+            })
+            .addCase(deleteStudentFromServer.fulfilled, (state, action) => {
+                state.list = state.list.filter(student => student.id !== action.payload);
+            })
     }
 });
 
-export const { addStudent, deleteStudent, toggleStudentStatus } = studentsSlice.actions;
+export const { toggleStudentStatus } = studentsSlice.actions;
 export default studentsSlice.reducer;

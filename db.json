@@ -1,0 +1,28 @@
+{
+  "students": [
+    {
+      "id": "1",
+      "name": "Анна Смирнова",
+      "language": "Japanese",
+      "targetExam": "JLPT N4",
+      "currentTopic": "Изучение иероглифов и аудирование",
+      "status": "active"
+    },
+    {
+      "id": "2",
+      "name": "Михаил Иванов",
+      "language": "English",
+      "targetExam": "IELTS",
+      "currentTopic": "Грамматика по Murphy: Past Perfect Continuous",
+      "status": "active"
+    },
+    {
+      "id": "1789059630421",
+      "name": "Карелин",
+      "language": "English",
+      "targetExam": "TOEFL",
+      "currentTopic": "Грамматика",
+      "status": "active"
+    }
+  ]
+}

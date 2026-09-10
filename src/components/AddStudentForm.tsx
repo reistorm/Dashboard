@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAppDispatch } from "../hooks/redux";
-import { addStudent, type Student } from "../store/studentsSlice";
+import { addNewStudent, type Student } from "../store/studentsSlice";
 
 const AddStudentForm = () => {
     const dispatch = useAppDispatch();
@@ -24,7 +24,7 @@ const AddStudentForm = () => {
             status: 'active',
         };
 
-        dispatch(addStudent(newStudent));
+        dispatch(addNewStudent(newStudent));
 
         setName('');
         setCurrentTopic('');
