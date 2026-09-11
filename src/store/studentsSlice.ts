@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export interface Student {
     id: string;
@@ -65,17 +65,34 @@ export const deleteStudentFromServer = createAsyncThunk<string, string>(
     }
 )
 
+export const toggleStudentStatusOnServer = createAsyncThunk<
+    Student,
+    { id: string; newStatus: 'active' | 'paused' }>(
+        'students/toggleStatus',
+        async ({ id, newStatus }) => {
+            const response = await fetch(`http://localhost:3001/students/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            if (!response.ok) {
+                throw new Error('Не удалось обновить статус на сервере');
+            }
+
+            const data = await response.json();
+            return data;
+        }
+
+
+    )
+
 const studentsSlice = createSlice({
     name: 'students',
     initialState,
-    reducers: {
-        toggleStudentStatus: (state, action: PayloadAction<string>) => {
-            const student = state.list.find(s => s.id === action.payload);
-            if (student) {
-                student.status = student.status === 'active' ? 'paused' : 'active';
-            }
-        }
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(fetchStudents.pending, (state) => {
@@ -96,8 +113,15 @@ const studentsSlice = createSlice({
             .addCase(deleteStudentFromServer.fulfilled, (state, action) => {
                 state.list = state.list.filter(student => student.id !== action.payload);
             })
+            .addCase(toggleStudentStatusOnServer.fulfilled, (state, action) => {
+                const updatedStudent = action.payload;
+                const index = state.list.findIndex(student => student.id === updatedStudent.id)
+
+                if (index !== -1) {
+                    state.list[index] = updatedStudent;
+                }
+            })
     }
 });
 
-export const { toggleStudentStatus } = studentsSlice.actions;
 export default studentsSlice.reducer;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
-import { toggleStudentStatus, fetchStudents, deleteStudentFromServer } from "../store/studentsSlice";
+import { fetchStudents, deleteStudentFromServer, toggleStudentStatusOnServer } from "../store/studentsSlice";
 
 const StudentsList = () => {
     const { list: students, isLoading, error } = useAppSelector((state) => state.students);
@@ -77,7 +77,10 @@ const StudentsList = () => {
                                 </td>
                                 <td style={{ padding: '15px', display: 'flex', gap: '10px' }}>
                                     <button
-                                        onClick={() => dispatch(toggleStudentStatus(student.id))}
+                                        onClick={() => {
+                                            const newStatus = student.status === 'active' ? 'paused' : 'active';
+                                            dispatch(toggleStudentStatusOnServer({ id: student.id, newStatus }))
+                                        }}
                                         style={{
                                             padding: '6px 10px',
                                             backgroundColor: '#e2e8f0',
