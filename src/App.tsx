@@ -3,6 +3,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Layout from './components/Layout';
 import StudentsList from './pages/StudentsList';
+import AddStudentForm from './components/AddStudentForm';
+import StudentProfile from './pages/StudentProfile';
 
 function App() {
   return (
@@ -10,9 +12,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/login" element={<Login />} />
+
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/students" element={<StudentsList />} />
+          <Route path="/student/:id" element={<StudentProfile />}/>
           {/* <Route path="/settings" element={<Settings />} /> */}
         </Route>
 

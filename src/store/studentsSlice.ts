@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export interface Student {
-    id: string;
+    id: string | number;
     name: string;
     language: 'English' | 'Japanese';
     targetExam: 'IELTS' | 'TOEFL' | 'JLPT N4';
@@ -85,8 +85,6 @@ export const toggleStudentStatusOnServer = createAsyncThunk<
             const data = await response.json();
             return data;
         }
-
-
     )
 
 const studentsSlice = createSlice({

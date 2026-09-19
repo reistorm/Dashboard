@@ -1,37 +1,40 @@
-import { useState } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { useAppDispatch } from "../hooks/redux";
-import { addNewStudent, type Student } from "../store/studentsSlice";
+import { addNewStudent } from "../store/studentsSlice";
+
+interface IFormInput {
+    name: string;
+    language: string;
+    targetExam: string;
+    currentTopic: string;
+}
 
 const AddStudentForm = () => {
     const dispatch = useAppDispatch();
 
-    const [name, setName] = useState('');
-    const [language, setLanguage] = useState<'English' | 'Japanese'>('English');
-    const [targetExam, setTargetExam] = useState<'IELTS' | 'TOEFL' | 'JLPT N4'>('IELTS');
-    const [currentTopic, setCurrentTopic] = useState('');
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<IFormInput>({
+        defaultValues: {
+            language: 'English',
+            targerExam: 'IELTS'
+        }
+    });
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!name.trim() || !currentTopic.trim()) return;
-
-        const newStudent: Student = {
+    const onSubmit: SubmitHandler<IFormInput> = (data) => {
+        const newStudent = {
             id: Date.now().toString(),
-            name: name,
-            language: language,
-            targetExam: targetExam,
-            currentTopic: currentTopic,
-            status: 'active',
+            name: data.name,
+            language: data.language,
+            targetExam: data.targetExam,
+            currentTopic: data.currentTopic,
+            status: 'active' as const,
         };
-
         dispatch(addNewStudent(newStudent));
-
-        setName('');
-        setCurrentTopic('');
+        reset();
     }
+
     return (
         <form
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -46,26 +49,34 @@ const AddStudentForm = () => {
         >
             <h3 style={{ margin: 0 }}>Новый студент</h3>
 
-            <input
-                type="text"
-                placeholder="ФИО студента"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-            />
+            <div>
+                <input
+                    type="text"
+                    placeholder="ФИО студента"
+                    {...register('name', {
+                        required: 'Пожалуйста, введите имя',
+                        minLength: { value: 2, message: 'Минимум 2 буквы' },
+                        pattern: {
+                            value: /%[А-Яа-яЁё\s-]+$/,
+                            message: 'ФИО может содержать только русские буквы'
+                        }
+                    })}
+                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                />
+                {errors.name && <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.name.message}</span>}
+            </div>
 
             <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as 'English' | 'Japanese')}
+                {...register('language')}
                 style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
             >
                 <option value="English">Английский</option>
                 <option value="Japanese">Японский</option>
             </select>
 
+
             <select
-                value={targetExam}
-                onChange={(e) => setTargetExam(e.target.value as 'IELTS' | 'TOEFL' | 'JLPT N4')}
+                {...register('targetExam')}
                 style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
             >
                 <option value="IELTS">IELTS</option>
@@ -73,13 +84,22 @@ const AddStudentForm = () => {
                 <option value="JLPT N4">JLPT N4</option>
             </select>
 
-            <input
-                type="text"
-                placeholder="Текущая тема"
-                value={currentTopic}
-                onChange={(e) => setCurrentTopic(e.target.value)}
-                style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
-            />
+            <div>
+                <input
+                    type="text"
+                    placeholder="Текущая тема"
+                    {...register('currentTopic', {
+                        required: 'Укажите тему',
+                        minLength: { value: 5, message: 'Тема должна содержать минимум 5 символа' },
+                        pattern: {
+                            value: /^[А-Яа-яЁёA-Za-z0-9\s.,-]+$/,
+                            message: 'Удалите некорректные спецсимволы'
+                        }
+                    })}
+                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                />
+                {errors.currentTopic && <span style={{ color: '#ef4444', fontSize: '12px' }}>{errors.currentTopic.message}</span>}
+            </div>
 
             <button
                 type="submit"

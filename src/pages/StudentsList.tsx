@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { fetchStudents, deleteStudentFromServer, toggleStudentStatusOnServer } from "../store/studentsSlice";
+import { Link } from "react-router-dom";
 
 const StudentsList = () => {
     const { list: students, isLoading, error } = useAppSelector((state) => state.students);
@@ -9,8 +10,10 @@ const StudentsList = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        dispatch(fetchStudents());
-    }, [dispatch])
+        if (students.length === 0) {
+            dispatch(fetchStudents());
+        }
+    }, [dispatch, students.length])
 
     const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -59,7 +62,7 @@ const StudentsList = () => {
                     <tbody>
                         {filteredStudents.map((student) => (
                             <tr key={student.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                                <td style={{ padding: '15px', fontWeight: 'bold', color: '#1e293b' }}>{student.name}</td>
+                                <td style={{ padding: '15px', fontWeight: 'bold', color: '#1e293b' }}><Link to={`/student/${student.id}`} style={{ color: '#3b82f6', textDecoration: 'none' }}>{student.name}</Link></td>
                                 <td style={{ padding: '15px' }}>{student.language}</td>
                                 <td style={{ padding: '15px' }}>{student.targetExam}</td>
                                 <td style={{ padding: '15px' }}>{student.currentTopic}</td>
@@ -79,7 +82,7 @@ const StudentsList = () => {
                                     <button
                                         onClick={() => {
                                             const newStatus = student.status === 'active' ? 'paused' : 'active';
-                                            dispatch(toggleStudentStatusOnServer({ id: student.id, newStatus }))
+                                            dispatch(toggleStudentStatusOnServer({ id: String(student.id), newStatus }))
                                         }}
                                         style={{
                                             padding: '6px 10px',
@@ -93,7 +96,7 @@ const StudentsList = () => {
                                         Сменить статус
                                     </button>
                                     <button
-                                        onClick={() => dispatch(deleteStudentFromServer(student.id))}
+                                        onClick={() => dispatch(deleteStudentFromServer(String(student.id)))}
                                         style={{
                                             padding: '6px 10px',
                                             backgroundColor: '#ef4444',
@@ -111,14 +114,17 @@ const StudentsList = () => {
                         ))}
                     </tbody>
                 </table>
-            )}
+            )
+            }
 
-            {!isLoading && !error && filteredStudents.length === 0 && (
-                <div style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
-                    Ученики не найдены
-                </div>
-            )}
-        </div>
+            {
+                !isLoading && !error && filteredStudents.length === 0 && (
+                    <div style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>
+                        Ученики не найдены
+                    </div>
+                )
+            }
+        </div >
     )
 }
 
