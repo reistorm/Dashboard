@@ -65,6 +65,22 @@ export const deleteStudentFromServer = createAsyncThunk<string, string>(
     }
 )
 
+export const updateStudentOnServer = createAsyncThunk(
+    'students/updateStudentOnServer',
+    async (updatedStudent: Student) => {
+        const response = await fetch(`http://localhost:3001/students/${updatedStudent.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedStudent),
+        });
+
+        if (!response.ok) throw new Error('Ошибка при обновлении студента');
+        return await response.json() as Student;
+    }
+)
+
 export const toggleStudentStatusOnServer = createAsyncThunk<
     Student,
     { id: string; newStatus: 'active' | 'paused' }>(
@@ -110,6 +126,12 @@ const studentsSlice = createSlice({
             })
             .addCase(deleteStudentFromServer.fulfilled, (state, action) => {
                 state.list = state.list.filter(student => student.id !== action.payload);
+            })
+            .addCase(updateStudentOnServer.fulfilled, (state, action) => {
+                const index = state.list.findIndex(s => String(s.id) === String(action.payload.id));
+                if (index !== -1) {
+                    state.list[index] = action.payload;
+                }
             })
             .addCase(toggleStudentStatusOnServer.fulfilled, (state, action) => {
                 const updatedStudent = action.payload;
