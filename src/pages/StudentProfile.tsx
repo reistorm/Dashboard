@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams, Link } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { fetchStudents, updateStudentOnServer } from '../store/studentsSlice';
@@ -48,6 +49,8 @@ const StudentProfile = () => {
 
             }));
             setIsEditing(false);
+
+            toast.success('Данные успешно сохранены!')
         }
     }
 

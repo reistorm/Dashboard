@@ -1,10 +1,16 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { fetchStudents, deleteStudentFromServer, toggleStudentStatusOnServer } from "../store/studentsSlice";
 import { Link } from "react-router-dom";
 
 const StudentsList = () => {
     const { list: students, isLoading, error } = useAppSelector((state) => state.students);
+    const totalStudents = students.length;
+    const activeStudents = students.filter(s => s.status === 'active').length;
+    const jlptStudents = students.filter(s => s.targetExam === 'JLPT N4').length;
+    const [filterLanguage, setFilterLanguage] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
     const dispatch = useAppDispatch();
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -15,10 +21,56 @@ const StudentsList = () => {
         }
     }, [dispatch, students.length])
 
-    const filteredStudents = students.filter((student) => student.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const filteredStudents = students.filter((student) => {
+        const matchName = student.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchLanguage = filterLanguage === '' || student.language === filterLanguage;
+        const matchStatus = filterStatus === '' || student.status === filterStatus;
+
+        return matchName && matchLanguage && matchStatus;
+    })
 
     return (
         <div>
+            <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
+
+                <div style={{ flex: 1, backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #3b82f6' }}>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#64748b', fontWeight: 'bold' }}>Всего учеников</p>
+                    <h3 style={{ margin: '10px 0 0', fontSize: '28px', color: '#0f172a' }}>{totalStudents}</h3>
+                </div>
+
+                <div style={{ flex: 1, backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #10b981' }}>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#64748b', fontWeight: 'bold' }}>Активных</p>
+                    <h3 style={{ margin: '10px 0 0', fontSize: '28px', color: '#0f172a' }}>{activeStudents}</h3>
+                </div>
+
+                <div style={{ flex: 1, backgroundColor: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', borderLeft: '4px solid #8b5cf6' }}>
+                    <p style={{ margin: 0, fontSize: '14px', color: '#64748b', fontWeight: 'bold' }}>Подготовка к JLPT N4</p>
+                    <h3 style={{ margin: '10px 0 0', fontSize: '28px', color: '#0f172a' }}>{jlptStudents}</h3>
+                </div>
+
+            </div>
+            <div style={{ display: 'flex', gap: '15px', marginBottom: '20px' }}>
+                <select
+                    value={filterLanguage}
+                    onChange={(e) => setFilterLanguage(e.target.value)}
+                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', outline: 'none' }}
+                >
+                    <option value="">Все языки</option>
+                    <option value="English">English</option>
+                    <option value="Japanese">Japanese</option>
+                </select>
+
+                <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', outline: 'none' }}
+                >
+                    <option value="">Любой статус</option>
+                    <option value="active">Активен</option>
+                    <option value="paused">Пауза</option>
+                </select>
+            </div>
             <h1 style={{ marginBottom: '20px' }}>База студентов</h1>
             <input
                 type="text"
@@ -96,7 +148,12 @@ const StudentsList = () => {
                                         Сменить статус
                                     </button>
                                     <button
-                                        onClick={() => dispatch(deleteStudentFromServer(String(student.id)))}
+                                        onClick={() => {
+                                            if (window.confirm('Точно удалить ученика?')) {
+                                                dispatch(deleteStudentFromServer(String(student.id)));
+                                                toast.error('Ученик удален');
+                                            }
+                                        }}
                                         style={{
                                             padding: '6px 10px',
                                             backgroundColor: '#ef4444',

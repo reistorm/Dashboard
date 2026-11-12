@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import StudentsList from './pages/StudentsList';
 import AddStudentForm from './components/AddStudentForm';
@@ -8,20 +9,22 @@ import StudentProfile from './pages/StudentProfile';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/login" element={<Login />} />
+    <>
+      <Toaster position="bottom-right" />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/login" element={<Login />} />
 
-        <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/students" element={<StudentsList />} />
-          <Route path="/student/:id" element={<StudentProfile />}/>
-          {/* <Route path="/settings" element={<Settings />} /> */}
-        </Route>
-
-      </Routes>
-    </BrowserRouter>
+          <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/students" element={<StudentsList />} />
+            <Route path="/student/:id" element={<StudentProfile />} />
+            {/* <Route path="/settings" element={<Settings />} /> */}
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </>
   )
 }
 

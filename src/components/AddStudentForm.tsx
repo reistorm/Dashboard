@@ -1,4 +1,5 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
+import toast from "react-hot-toast";
 import { useAppDispatch } from "../hooks/redux";
 import { addNewStudent } from "../store/studentsSlice";
 
@@ -29,6 +30,7 @@ const AddStudentForm = () => {
             status: 'active' as const,
         };
         dispatch(addNewStudent(newStudent));
+        toast.success('Студент успешно зарегистрирован!');
         reset();
     }
 
@@ -57,7 +59,7 @@ const AddStudentForm = () => {
                         required: 'Пожалуйста, введите имя',
                         minLength: { value: 2, message: 'Минимум 2 буквы' },
                         pattern: {
-                            value: /%[А-Яа-яЁё\s-]+$/,
+                            value: /^[А-Яа-яЁё\s-]+$/,
                             message: 'ФИО может содержать только русские буквы'
                         }
                     })}
